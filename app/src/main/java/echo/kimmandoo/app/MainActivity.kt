@@ -16,8 +16,8 @@ import echo.kimmandoo.app.ui.theme.EchoTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         installSplashScreen()
+        super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             EchoTheme {
