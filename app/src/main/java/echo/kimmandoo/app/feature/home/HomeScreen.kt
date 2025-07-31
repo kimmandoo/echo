@@ -1,5 +1,6 @@
 package echo.kimmandoo.app.feature.home
 
+import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -7,12 +8,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import echo.kimmandoo.app.feature.diary.DiaryWriteScreen
 
 @Composable
 fun HomeScreen(padding: PaddingValues = PaddingValues()) {
-    Box(modifier = Modifier.padding(paddingValues = padding)) {
-        Text(text = "Home")
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        DiaryWriteScreen()
     }
+//    Box(modifier = Modifier.padding(paddingValues = padding)) {
+//        Text(text = "Home")
+//    }
 }
 
 @Preview

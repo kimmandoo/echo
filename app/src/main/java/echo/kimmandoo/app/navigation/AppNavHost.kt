@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import echo.kimmandoo.app.feature.auth.AuthScreen
+import echo.kimmandoo.app.feature.diary.DiaryWriteScreen
 import echo.kimmandoo.app.feature.home.HomeScreen
 
 @Composable
@@ -24,6 +25,9 @@ fun AppNavHost(
         }
         composable<Screen.Home> {
             HomeScreen()
+        }
+        composable<Screen.DiaryWrite> {
+            DiaryWriteScreen()
         }
     }
 }

@@ -9,4 +9,7 @@ sealed class Screen {
 
     @Serializable
     data object Home : Screen()
+
+    @Serializable
+    data object DiaryWrite: Screen()
 }
