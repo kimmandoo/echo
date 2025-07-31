@@ -15,7 +15,7 @@ composeBom = "2025.07.00"
 ktlint = "13.0.0"
 splash = "1.0.1"
 serialization = "1.9.0"
-navigation = "2.9.0-beta04"
+navigation = "2.9.2"
 gms = "4.4.3"
 crashlytics = "3.0.5"
 
@@ -38,7 +38,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 
 kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 splash-screen = { module = "androidx.core:core-splashscreen" , version.ref ="splash" }
-compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation" }
+compose-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
 
 # firebase + auth
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
