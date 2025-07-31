@@ -66,11 +66,10 @@ class GoogleAuthUiClient(
             SignInResult.Error("기기에 로그인된 구글 계정이 없습니다. 계정을 추가한 후 다시 시도해주세요.")
         } catch (e: GetCredentialException) {
             Log.e(TAG, "Couldn't retrieve user's credentials.", e)
-            SignInResult.Error("로그인에 실패했습니다: ${e.message}")
+            SignInResult.Error("로그인에 실패했습니다")
         } catch (e: Exception) {
             Log.e(TAG, "Sign-in failed", e)
-            if (e is CancellationException) throw e
-            SignInResult.Error("알 수 없는 오류가 발생했습니다: ${e.message}")
+            SignInResult.Error("알 수 없는 오류가 발생했습니다")
         }
     }
 
@@ -81,7 +80,7 @@ class GoogleAuthUiClient(
             Log.d(TAG, "Sign-out successful")
         } catch (e: Exception) {
             Log.e(TAG, "Sign-out failed: ${e.message}")
-            if (e is CancellationException) throw e
+            SignInResult.Error("로그아웃에 실패했습니다")
         }
     }
 

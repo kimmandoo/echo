@@ -12,6 +12,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.ViewModel
@@ -70,7 +71,9 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     AppNavHost(
                         navController = navController,
-                        startDestination = Screen.Auth,
+                        startDestination = remember {
+                            if (googleAuthUiClient.getSignedInUser() != null) Screen.Home else Screen.Auth
+                        },
                         modifier = Modifier.padding(innerPadding),
                     )
                 }
