@@ -17,7 +17,6 @@ import com.google.firebase.auth.GoogleAuthProvider
 import echo.kimmandoo.app.R
 import echo.kimmandoo.app.feature.auth.model.SignInResult
 import kotlinx.coroutines.tasks.await
-import kotlin.coroutines.cancellation.CancellationException
 
 class GoogleAuthUiClient(
     private val context: Context,

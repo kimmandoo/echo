@@ -11,5 +11,25 @@ sealed class Screen {
     data object Home : Screen()
 
     @Serializable
-    data object DiaryWrite: Screen()
+    data object DiaryCreation : Screen()
+
+    @Serializable
+    data object Profile : Screen()
+
+    @Serializable
+    data object MyDiaries : Screen()
+
+    @Serializable
+    data object History : Screen()
+
+    @Serializable
+    data object ReceiveDiary : Screen()
+
+    @Serializable
+    data class ReceivedDiary(
+        val diaryContent: String,
+    ) : Screen()
+
+    @Serializable
+    data object ReplyDiary : Screen()
 }

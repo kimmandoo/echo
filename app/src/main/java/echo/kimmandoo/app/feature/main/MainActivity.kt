@@ -71,9 +71,10 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     AppNavHost(
                         navController = navController,
-                        startDestination = remember {
-                            if (googleAuthUiClient.getSignedInUser() != null) Screen.Home else Screen.Auth
-                        },
+                        startDestination =
+                            remember {
+                                if (googleAuthUiClient.getSignedInUser() != null) Screen.Home else Screen.Auth
+                            },
                         modifier = Modifier.padding(innerPadding),
                     )
                 }

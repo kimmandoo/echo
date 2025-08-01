@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "echo.kimmandoo.app"
-        minSdk = 24
+        minSdk = 28
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -72,4 +72,5 @@ dependencies {
     implementation(libs.googleid)
 
     implementation(libs.compose.navigation)
+    
 }
