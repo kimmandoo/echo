@@ -39,9 +39,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,6 +64,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import echo.kimmandoo.app.navigation.Screen
+import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
@@ -69,10 +73,11 @@ private data class MenuItem(
     val title: String,
     val icon: ImageVector,
     val route: Screen,
-    var offset: Offset
+    var offset: Offset,
+    var velocity: Offset = Offset.Zero
 )
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnusedBoxWithConstraintsScope")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(
     padding: PaddingValues = PaddingValues(),
@@ -81,17 +86,6 @@ fun HomeScreen(
     val currentUser = Firebase.auth.currentUser
     val starCoins = 12
     val hasFreeExchange = true
-
-    val menuItemsState = remember {
-        mutableStateOf(
-            listOf(
-                MenuItem(1, "일기 쓰기", Icons.Default.Create, Screen.DiaryCreation, Offset(-120f, 350f)),
-                MenuItem(2, "나의 일기장", Icons.Default.Home, Screen.MyDiaries, Offset(-40f, 350f)),
-                MenuItem(3, "내 프로필", Icons.Default.Person, Screen.Profile, Offset(40f, 350f)),
-                MenuItem(4, "교환 기록", Icons.Default.Refresh, Screen.History, Offset(120f, 350f))
-            )
-        )
-    }
 
     Scaffold {
         Box(
@@ -119,77 +113,115 @@ fun HomeScreen(
                 }
             }
 
-            BoxWithConstraints(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                val density = LocalDensity.current
-                val itemRadiusPx = remember { with(density) { (64.dp / 2).toPx() } }
-                val itemWidthPx = remember { with(density) { 64.dp.toPx() } }
-                val itemHeightPx = remember { with(density) { 90.dp.toPx() } } // Approximate height of the draggable item
+            PhysicsBasedMenuLayout(navController)
+        }
+    }
+}
 
-                val screenWidthPx = with(density) { maxWidth.toPx() }
-                val screenHeightPx = with(density) { maxHeight.toPx() }
+@SuppressLint("UnusedBoxWithConstraintsScope")
+@Composable
+private fun PhysicsBasedMenuLayout(navController: NavController) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        val density = LocalDensity.current
+        val screenWidthPx = with(density) { maxWidth.toPx() }
+        val screenHeightPx = with(density) { maxHeight.toPx() }
 
-                fun handleDrag(draggedItemId: Int, dragAmount: Offset) {
-                    val currentItems = menuItemsState.value.toMutableList()
-                    val draggedItemIndex = currentItems.indexOfFirst { it.id == draggedItemId }
-                    if (draggedItemIndex == -1) return
+        val menuItemsState = remember(maxWidth, maxHeight) {
+            val yOffset = screenHeightPx * 0.35f
+            val itemCount = 4
+            val spacing = screenWidthPx / (itemCount + 1)
+            mutableStateOf(
+                listOf(
+                    MenuItem(1, "일기 쓰기", Icons.Default.Create, Screen.DiaryCreation, Offset(spacing * 1 - screenWidthPx / 2, yOffset)),
+                    MenuItem(2, "나의 일기장", Icons.Default.Home, Screen.MyDiaries, Offset(spacing * 2 - screenWidthPx / 2, yOffset)),
+                    MenuItem(3, "내 프로필", Icons.Default.Person, Screen.Profile, Offset(spacing * 3 - screenWidthPx / 2, yOffset)),
+                    MenuItem(4, "교환 기록", Icons.Default.Refresh, Screen.History, Offset(spacing * 4 - screenWidthPx / 2, yOffset))
+                )
+            )
+        }
 
-                    val draggedItem = currentItems[draggedItemIndex]
-                    currentItems[draggedItemIndex] = draggedItem.copy(offset = draggedItem.offset + dragAmount)
+        var draggedItemId by remember { mutableStateOf<Int?>(null) }
 
-                    for (i in 0 until currentItems.size) {
-                        for (j in i + 1 until currentItems.size) {
-                            val itemA = currentItems[i]
-                            val itemB = currentItems[j]
+        // Physics simulation loop
+        LaunchedEffect(menuItemsState) {
+            var lastFrameTime = withFrameNanos { it }
+            while (true) {
+                val frameTime = withFrameNanos { it }
+                val deltaTime = ((frameTime - lastFrameTime) / 1_000_000_000f).coerceAtMost(0.016f) // delta in seconds, capped at 60fps
+                lastFrameTime = frameTime
 
-                            val dx = itemA.offset.x - itemB.offset.x
-                            val dy = itemA.offset.y - itemB.offset.y
-                            val distance = sqrt(dx * dx + dy * dy)
-                            val minDistance = 2 * itemRadiusPx
+                val currentItems = menuItemsState.value
+                val newItems = currentItems.toMutableList()
 
-                            if (distance < minDistance && distance != 0f) {
-                                val overlap = minDistance - distance
-                                val normal = Offset(dx / distance, dy / distance)
+                val itemRadiusPx = with(density) { 32.dp.toPx() }
+                val friction = 0.98f
+                val repulsionStrength = 2000f
 
-                                when {
-                                    itemA.id == draggedItemId -> currentItems[j] = itemB.copy(offset = itemB.offset - normal * overlap)
-                                    itemB.id == draggedItemId -> currentItems[i] = itemA.copy(offset = itemA.offset + normal * overlap)
-                                    else -> {
-                                        val halfOverlap = overlap / 2
-                                        currentItems[i] = itemA.copy(offset = itemA.offset + normal * halfOverlap)
-                                        currentItems[j] = itemB.copy(offset = itemB.offset - normal * halfOverlap)
-                                    }
-                                }
-                            }
+                for (i in newItems.indices) {
+                    if (newItems[i].id == draggedItemId) continue
+
+                    var netForce = Offset.Zero
+
+                    // Repulsion from other items
+                    for (j in newItems.indices) {
+                        if (i == j) continue
+                        val dx = newItems[i].offset.x - newItems[j].offset.x
+                        val dy = newItems[i].offset.y - newItems[j].offset.y
+                        val distance = sqrt(dx * dx + dy * dy)
+                        val minDistance = 2 * itemRadiusPx
+
+                        if (distance < minDistance && distance != 0f) {
+                            val direction = Offset(dx, dy) / distance
+                            val forceMagnitude = repulsionStrength * (minDistance - distance) / minDistance
+                            netForce += direction * forceMagnitude
                         }
                     }
 
-                    val xMax = (screenWidthPx - itemWidthPx) / 2
-                    val yMax = (screenHeightPx - itemHeightPx) / 2
+                    // Update velocity and position
+                    val item = newItems[i]
+                    var newVelocity = (item.velocity + netForce * deltaTime) * friction
+                    val newOffset = item.offset + newVelocity * deltaTime
 
-                    val clampedItems = currentItems.map {
-                        val clampedX = it.offset.x.coerceIn(-xMax, xMax)
-                        val clampedY = it.offset.y.coerceIn(-yMax, yMax)
-                        it.copy(offset = Offset(clampedX, clampedY))
+                    // Boundary collision
+                    val xMax = (screenWidthPx / 2) - itemRadiusPx
+                    val yMax = (screenHeightPx / 2) - itemRadiusPx
+
+                    if (newOffset.x !in -xMax..xMax) {
+                        newVelocity = newVelocity.copy(x = -newVelocity.x * 0.8f)
+                    }
+                    if (newOffset.y !in -yMax..yMax) {
+                        newVelocity = newVelocity.copy(y = -newVelocity.y * 0.8f)
                     }
 
-                    menuItemsState.value = clampedItems
+                    val clampedX = newOffset.x.coerceIn(-xMax, xMax)
+                    val clampedY = newOffset.y.coerceIn(-yMax, yMax)
+
+                    newItems[i] = item.copy(offset = Offset(clampedX, clampedY), velocity = newVelocity)
                 }
 
-                TodaySun(onClick = { navController.navigate(Screen.ReceiveDiary) })
-
-                menuItemsState.value.forEach { item ->
-                    DraggableMenuButton(
-                        modifier = Modifier.offset { IntOffset(item.offset.x.roundToInt(), item.offset.y.roundToInt()) },
-                        icon = item.icon,
-                        title = item.title,
-                        onClick = { navController.navigate(item.route) },
-                        onDrag = { dragAmount -> handleDrag(item.id, dragAmount) }
-                    )
-                }
+                menuItemsState.value = newItems
             }
+        }
+
+        TodaySun(onClick = { navController.navigate(Screen.ReceiveDiary) })
+
+        menuItemsState.value.forEach { item ->
+            DraggableMenuButton(
+                modifier = Modifier.offset { IntOffset(item.offset.x.roundToInt(), item.offset.y.roundToInt()) },
+                icon = item.icon,
+                title = item.title,
+                onClick = { navController.navigate(item.route) },
+                onDragStart = { draggedItemId = item.id },
+                onDrag = { dragAmount ->
+                    val items = menuItemsState.value.toMutableList()
+                    val index = items.indexOfFirst { it.id == item.id }
+                    if (index != -1) {
+                        items[index] = items[index].copy(offset = items[index].offset + dragAmount)
+                        menuItemsState.value = items
+                    }
+                },
+                onDragEnd = { draggedItemId = null }
+            )
         }
     }
 }
@@ -264,16 +296,21 @@ fun DraggableMenuButton(
     icon: ImageVector,
     title: String,
     onClick: () -> Unit,
-    onDrag: (Offset) -> Unit
+    onDragStart: () -> Unit,
+    onDrag: (Offset) -> Unit,
+    onDragEnd: () -> Unit
 ) {
     Column(
         modifier = modifier
             .pointerInput(Unit) {
-                detectDragGestures {
-                    change, dragAmount ->
+                detectDragGestures(
+                    onDragStart = { onDragStart() },
+                    onDrag = { change, dragAmount ->
                         change.consume()
                         onDrag(dragAmount)
-                }
+                    },
+                    onDragEnd = { onDragEnd() }
+                )
             }
             .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -297,5 +334,4 @@ fun DraggableMenuButton(
 fun HomeScreenPreview() {
     HomeScreen(navController = rememberNavController())
 }
-
 
