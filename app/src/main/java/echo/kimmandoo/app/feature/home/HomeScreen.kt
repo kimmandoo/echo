@@ -286,7 +286,7 @@ fun TodaySun(onClick: () -> Unit) {
                 )
             )
         }
-        Text("오늘의 햇살", color = Color(0xFF4E342E), fontWeight = FontWeight.Bold, fontSize = 22.sp, style = MaterialTheme.typography.titleLarge)
+//        Text("오늘의 햇살", color = Color(0xFF4E342E), fontWeight = FontWeight.Bold, fontSize = 22.sp, style = MaterialTheme.typography.titleLarge)
     }
 }
 
