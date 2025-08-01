@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -64,7 +63,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import echo.kimmandoo.app.navigation.Screen
-import kotlin.math.pow
+import echo.kimmandoo.app.ui.theme.GradientBackground
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
@@ -74,7 +73,7 @@ private data class MenuItem(
     val icon: ImageVector,
     val route: Screen,
     var offset: Offset,
-    var velocity: Offset = Offset.Zero
+    var velocity: Offset = Offset.Zero,
 )
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -89,25 +88,28 @@ fun HomeScreen(
 
     Scaffold {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(Color(0xFFFFF3E0), Color(0xFFFFE0B2))
-                    )
-                )
-                .padding(padding)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = GradientBackground,
+                    ).padding(padding),
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Column(
                     modifier = Modifier.padding(top = 48.dp, start = 24.dp, end = 24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text("오늘의 햇살,", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Color(0xFF4E342E))
-                    Text("${currentUser?.displayName ?: "익명"}님의 이야기", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = Color(0xFF4E342E))
+                    Text(
+                        "${currentUser?.displayName ?: "익명"}님의 이야기",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF4E342E),
+                    )
                     Spacer(modifier = Modifier.height(24.dp))
                     UserStatus(starCoins = starCoins, hasFreeExchange = hasFreeExchange)
                 }
@@ -126,19 +128,20 @@ private fun PhysicsBasedMenuLayout(navController: NavController) {
         val screenWidthPx = with(density) { maxWidth.toPx() }
         val screenHeightPx = with(density) { maxHeight.toPx() }
 
-        val menuItemsState = remember(maxWidth, maxHeight) {
-            val yOffset = screenHeightPx * 0.35f
-            val itemCount = 4
-            val spacing = screenWidthPx / (itemCount + 1)
-            mutableStateOf(
-                listOf(
-                    MenuItem(1, "일기 쓰기", Icons.Default.Create, Screen.DiaryCreation, Offset(spacing * 1 - screenWidthPx / 2, yOffset)),
-                    MenuItem(2, "나의 일기장", Icons.Default.Home, Screen.MyDiaries, Offset(spacing * 2 - screenWidthPx / 2, yOffset)),
-                    MenuItem(3, "내 프로필", Icons.Default.Person, Screen.Profile, Offset(spacing * 3 - screenWidthPx / 2, yOffset)),
-                    MenuItem(4, "교환 기록", Icons.Default.Refresh, Screen.History, Offset(spacing * 4 - screenWidthPx / 2, yOffset))
+        val menuItemsState =
+            remember(maxWidth, maxHeight) {
+                val yOffset = screenHeightPx * 0.35f
+                val itemCount = 4
+                val spacing = screenWidthPx / (itemCount + 1)
+                mutableStateOf(
+                    listOf(
+                        MenuItem(1, "일기 쓰기", Icons.Default.Create, Screen.DiaryCreation, Offset(spacing * 1 - screenWidthPx / 2, yOffset)),
+                        MenuItem(2, "나의 일기장", Icons.Default.Home, Screen.MyDiaries, Offset(spacing * 2 - screenWidthPx / 2, yOffset)),
+                        MenuItem(3, "내 프로필", Icons.Default.Person, Screen.Profile, Offset(spacing * 3 - screenWidthPx / 2, yOffset)),
+                        MenuItem(4, "교환 기록", Icons.Default.Refresh, Screen.History, Offset(spacing * 4 - screenWidthPx / 2, yOffset)),
+                    ),
                 )
-            )
-        }
+            }
 
         var draggedItemId by remember { mutableStateOf<Int?>(null) }
 
@@ -220,21 +223,25 @@ private fun PhysicsBasedMenuLayout(navController: NavController) {
                         menuItemsState.value = items
                     }
                 },
-                onDragEnd = { draggedItemId = null }
+                onDragEnd = { draggedItemId = null },
             )
         }
     }
 }
 
 @Composable
-fun UserStatus(starCoins: Int, hasFreeExchange: Boolean) {
+fun UserStatus(
+    starCoins: Int,
+    hasFreeExchange: Boolean,
+) {
     Row(
-        modifier = Modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color.Black.copy(alpha = 0.05f))
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color.Black.copy(alpha = 0.05f))
+                .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(24.dp)
+        horizontalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         val textColor = Color(0xFF5D4037)
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -247,12 +254,13 @@ fun UserStatus(starCoins: Int, hasFreeExchange: Boolean) {
                 if (hasFreeExchange) Icons.Default.Check else Icons.Default.Star,
                 contentDescription = "무료 교환",
                 tint = if (hasFreeExchange) Color(0xFF4CAF50) else textColor.copy(alpha = 0.7f),
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(20.dp),
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = if (hasFreeExchange) "무료 교환 가능" else "교환 완료",
-                color = textColor, fontWeight = FontWeight.Medium
+                color = textColor,
+                fontWeight = FontWeight.Medium,
             )
         }
     }
@@ -262,28 +270,32 @@ fun UserStatus(starCoins: Int, hasFreeExchange: Boolean) {
 fun TodaySun(onClick: () -> Unit) {
     val infiniteTransition = rememberInfiniteTransition(label = "sunPulse")
     val pulse by infiniteTransition.animateFloat(
-        initialValue = 0.95f, targetValue = 1.05f,
+        initialValue = 0.95f,
+        targetValue = 1.05f,
         animationSpec = infiniteRepeatable(animation = tween(3000), repeatMode = RepeatMode.Reverse),
-        label = "pulseAnimation"
+        label = "pulseAnimation",
     )
 
     Box(
-        modifier = Modifier
-            .size(160.dp)
-            .clickable(remember { MutableInteractionSource() }, indication = null, onClick = onClick),
-        contentAlignment = Alignment.Center
+        modifier =
+            Modifier
+                .size(160.dp)
+                .clickable(remember { MutableInteractionSource() }, indication = null, onClick = onClick),
+        contentAlignment = Alignment.Center,
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(
-                        Color(0xFFFFF59D).copy(alpha = 0.9f * pulse),
-                        Color(0xFFFBC02D).copy(alpha = 0.5f * pulse),
-                        Color.Transparent
+                brush =
+                    Brush.radialGradient(
+                        colors =
+                            listOf(
+                                Color(0xFFFFF59D).copy(alpha = 0.9f * pulse),
+                                Color(0xFFFBC02D).copy(alpha = 0.5f * pulse),
+                                Color.Transparent,
+                            ),
+                        center = Offset(size.width / 2, size.height / 2),
+                        radius = size.width / 2 * pulse,
                     ),
-                    center = Offset(size.width / 2, size.height / 2),
-                    radius = size.width / 2 * pulse
-                )
             )
         }
 //        Text("오늘의 햇살", color = Color(0xFF4E342E), fontWeight = FontWeight.Bold, fontSize = 22.sp, style = MaterialTheme.typography.titleLarge)
@@ -298,33 +310,34 @@ fun DraggableMenuButton(
     onClick: () -> Unit,
     onDragStart: () -> Unit,
     onDrag: (Offset) -> Unit,
-    onDragEnd: () -> Unit
+    onDragEnd: () -> Unit,
 ) {
     Column(
-        modifier = modifier
-            .pointerInput(Unit) {
-                detectDragGestures(
-                    onDragStart = { onDragStart() },
-                    onDrag = { change, dragAmount ->
-                        change.consume()
-                        onDrag(dragAmount)
-                    },
-                    onDragEnd = { onDragEnd() }
-                )
-            }
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = onClick
-            ),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier =
+            modifier
+                .pointerInput(Unit) {
+                    detectDragGestures(
+                        onDragStart = { onDragStart() },
+                        onDrag = { change, dragAmount ->
+                            change.consume()
+                            onDrag(dragAmount)
+                        },
+                        onDragEnd = { onDragEnd() },
+                    )
+                }.clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onClick,
+                ),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box(
-            modifier = Modifier
-                .size(64.dp)
-                .clip(CircleShape)
-                .background(Color.White.copy(alpha = 0.5f)),
-            contentAlignment = Alignment.Center
+            modifier =
+                Modifier
+                    .size(64.dp)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = 0.5f)),
+            contentAlignment = Alignment.Center,
         ) {
             Icon(icon, contentDescription = title, tint = Color(0xFF5D4037), modifier = Modifier.size(32.dp))
         }
@@ -338,5 +351,3 @@ fun DraggableMenuButton(
 fun HomeScreenPreview() {
     HomeScreen(navController = rememberNavController())
 }
-
-

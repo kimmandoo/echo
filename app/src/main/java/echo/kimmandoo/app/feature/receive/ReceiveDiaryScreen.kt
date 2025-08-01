@@ -22,13 +22,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import echo.kimmandoo.app.navigation.Screen
+import echo.kimmandoo.app.ui.theme.GradientBackground
 
 @Composable
 fun ReceiveDiaryScreen(navController: NavController) {
@@ -37,14 +37,12 @@ fun ReceiveDiaryScreen(navController: NavController) {
 
     Scaffold {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(Color(0xFFFFF3E0), Color(0xFFFFE0B2))
-                    )
-                )
-                .padding(it),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = GradientBackground,
+                    ).padding(it),
             contentAlignment = Alignment.Center,
         ) {
             Column(
@@ -55,15 +53,13 @@ fun ReceiveDiaryScreen(navController: NavController) {
                     "다른 사람의 일기를 받아보시겠어요?",
                     style = MaterialTheme.typography.titleLarge,
                     color = Color(0xFF4E342E),
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
                 Spacer(modifier = Modifier.height(48.dp))
 
                 // Action Buttons
                 AnimatedVisibility(
                     visible = !uiState.isLoading,
-                    enter = fadeIn(animationSpec = tween(300)),
-                    exit = fadeOut(animationSpec = tween(300)),
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         AnimatedVisibility(visible = uiState.isFreeChanceAvailable) {
@@ -83,8 +79,6 @@ fun ReceiveDiaryScreen(navController: NavController) {
                 // Loading Indicator
                 AnimatedVisibility(
                     visible = uiState.isLoading,
-                    enter = fadeIn(animationSpec = tween(300, delayMillis = 300)),
-                    exit = fadeOut(animationSpec = tween(300)),
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         CircularProgressIndicator(color = Color(0xFF8D6E63))
@@ -93,7 +87,7 @@ fun ReceiveDiaryScreen(navController: NavController) {
                             text = "일기를 찾고 있어요...",
                             color = Color(0xFF5D4037),
                             style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
                         )
                     }
                 }
@@ -107,4 +101,3 @@ fun ReceiveDiaryScreen(navController: NavController) {
         }
     }
 }
-

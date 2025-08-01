@@ -28,7 +28,6 @@ class ReceiveDiaryViewModel : ViewModel() {
                 val diary = "오늘 날씨는 정말 좋았다. 하늘은 맑고, 바람은 시원했다. 이런 날에는 어디론가 훌쩍 떠나고 싶다."
                 _uiState.update {
                     it.copy(
-                        isLoading = false,
                         receivedDiary = diary,
                         isFreeChanceAvailable = if (!useCoin) false else it.isFreeChanceAvailable,
                     )

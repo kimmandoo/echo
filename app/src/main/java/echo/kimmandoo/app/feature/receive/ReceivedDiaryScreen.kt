@@ -1,13 +1,14 @@
 package echo.kimmandoo.app.feature.receive
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import echo.kimmandoo.app.navigation.Screen
+import echo.kimmandoo.app.ui.theme.GradientBackground
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -75,37 +76,51 @@ fun ReceivedDiaryScreen(
         letterAlpha.animateTo(1f, tween(500))
 
         // 2. Main descent animation
-        val descentJob = launch {
-            offsetY.animateTo(
-                targetValue = 0f,
-                animationSpec = tween(durationMillis = 5000, easing = EaseInOutCubic)
-            )
-        }
+        val descentJob =
+            launch {
+                offsetY.animateTo(
+                    targetValue = 0f,
+                    animationSpec = tween(durationMillis = 5000, easing = EaseInOutCubic),
+                )
+            }
 
         // 3. Dynamic falling leaf animation
+        var spinDirection = 1
         launch {
             while (descentJob.isActive) {
-                val targetRotationX = (Math.random() * 60 - 30).toFloat() // Wider tumble
-                val targetRotationZ = rotationZ.value + (Math.random() * 120 - 60).toFloat() // Sharper turns
+                val targetRotationX = (Math.random() * 80 - 40).toFloat() // Wider tumble
+//                val targetRotationZ = rotationZ.value + (Math.random() * 90 - 45).toFloat() // Sharper turns
+                val targetRotationZ =
+                    rotationZ.value + ((Math.random() * 45 + 45).toFloat() * spinDirection)
+                spinDirection *= -1
                 val targetOffsetX = (Math.random() * 400 - 200).toFloat() // Wider sway
-                val duration = (1000 + Math.random() * 600).toLong() // Faster transitions
+                val duration = (1500 + Math.random() * 300).toLong() // Faster transitions
 
                 launch {
                     rotationX.animateTo(
                         targetValue = targetRotationX,
-                        animationSpec = tween(durationMillis = duration.toInt(), easing = EaseInOutCubic)
+                        animationSpec = tween(
+                            durationMillis = duration.toInt(),
+                            easing = EaseInOutCubic
+                        ),
                     )
                 }
                 launch {
                     rotationZ.animateTo(
                         targetValue = targetRotationZ,
-                        animationSpec = tween(durationMillis = duration.toInt(), easing = EaseInOutCubic)
+                        animationSpec = tween(
+                            durationMillis = duration.toInt(),
+                            easing = EaseInOutCubic
+                        ),
                     )
                 }
                 launch {
                     offsetX.animateTo(
                         targetValue = targetOffsetX,
-                        animationSpec = tween(durationMillis = duration.toInt(), easing = EaseInOutCubic)
+                        animationSpec = tween(
+                            durationMillis = duration.toInt(),
+                            easing = EaseInOutCubic
+                        ),
                     )
                 }
                 delay(duration)
@@ -129,65 +144,78 @@ fun ReceivedDiaryScreen(
         buttonAlpha.animateTo(1f, animationSpec = tween(500))
     }
 
-    Scaffold(
-        containerColor = Color.Transparent,
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(Color(0xFFFFF3E0), Color(0xFFFFE0B2))
-                    )
-                )
-                .padding(paddingValues),
-            contentAlignment = Alignment.Center
-        ) {
-            // Animated Letter
-            FlyingLetter(
-                modifier = Modifier.graphicsLayer {
-                    translationX = offsetX.value
-                    translationY = offsetY.value
-                    this.rotationZ = rotationZ.value
-                    this.rotationX = rotationX.value
-                    alpha = letterAlpha.value
-                },
-                state = letterState,
-                content = diaryContent,
-                contentAlpha = contentAlpha.value
-            )
-
-            // Buttons at the bottom
-            Row(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 48.dp, start = 24.dp, end = 24.dp)
-                    .alpha(buttonAlpha.value),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+    AnimatedVisibility(
+        visible = true,
+        enter = fadeIn(animationSpec = tween(300))
+    ) {
+        Scaffold(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(brush = GradientBackground),
+            containerColor = Color.Transparent,
+        ) { paddingValues ->
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                contentAlignment = Alignment.Center,
             ) {
-                Button(
-                    onClick = { navController.popBackStack() },
-                    modifier = Modifier.weight(1f).height(56.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+                // Animated Letter
+                FlyingLetter(
+                    modifier =
+                        Modifier.graphicsLayer {
+                            translationX = offsetX.value
+                            translationY = offsetY.value
+                            this.rotationZ = rotationZ.value
+                            this.rotationX = rotationX.value
+                            alpha = letterAlpha.value
+                        },
+                    state = letterState,
+                    content = diaryContent,
+                    contentAlpha = contentAlpha.value,
+                )
+
+                // Buttons at the bottom
+                Row(
+                    modifier =
+                        Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = 48.dp, start = 24.dp, end = 24.dp)
+                            .alpha(buttonAlpha.value),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    Icon(Icons.Default.Close, contentDescription = "닫기")
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("닫기", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                }
-                Button(
-                    onClick = { navController.navigate(Screen.ReplyDiary) },
-                    modifier = Modifier.weight(1f).height(56.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                ) {
-                    Icon(Icons.Default.Send, contentDescription = "답장하기")
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("답장하기", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Button(
+                        onClick = { navController.popBackStack() },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+                    ) {
+                        Icon(Icons.Default.Close, contentDescription = "닫기")
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("닫기", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    }
+                    Button(
+                        onClick = { navController.navigate(Screen.ReplyDiary) },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                    ) {
+                        Icon(Icons.Default.Send, contentDescription = "답장하기")
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("답장하기", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    }
                 }
             }
         }
+
     }
+
 }
 
 enum class LetterState { Folded, Unfolding }
@@ -197,19 +225,30 @@ fun FlyingLetter(
     modifier: Modifier = Modifier,
     state: LetterState,
     content: String,
-    contentAlpha: Float
+    contentAlpha: Float,
 ) {
     Card(
-        modifier = modifier
-            .animateContentSize(animationSpec = tween(durationMillis = 800, easing = EaseInOutCubic))
-            .then(
-                if (state == LetterState.Folded) Modifier.size(120.dp, 80.dp)
-                else Modifier.fillMaxWidth(0.9f).height(400.dp)
-            )
-            .clip(RoundedCornerShape(12.dp)), // clip is redundant here due to shape
+        modifier =
+            modifier
+                .animateContentSize(
+                    animationSpec = tween(
+                        durationMillis = 800,
+                        easing = EaseInOutCubic
+                    )
+                )
+                .then(
+                    if (state == LetterState.Folded) {
+                        Modifier.size(120.dp, 80.dp)
+                    } else {
+                        Modifier
+                            .fillMaxWidth(0.9f)
+                            .height(400.dp)
+                    },
+                )
+                .clip(shape = RoundedCornerShape(12.dp)),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF8E1)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF7F5F0)), // New paper color
+        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp), // Increased elevation
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             if (state == LetterState.Folded) {
@@ -217,17 +256,18 @@ fun FlyingLetter(
                     imageVector = Icons.Filled.Email,
                     contentDescription = "편지",
                     modifier = Modifier.size(48.dp),
-                    tint = Color(0xFF8D6E63)
+                    tint = Color(0xFF8D6E63),
                 )
             } else {
                 Text(
-                    modifier = Modifier
-                        .padding(24.dp)
-                        .alpha(contentAlpha),
+                    modifier =
+                        Modifier
+                            .padding(24.dp)
+                            .alpha(contentAlpha),
                     text = content,
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color(0xFF5D4037),
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
                 )
             }
         }
@@ -237,7 +277,8 @@ fun FlyingLetter(
 @Preview(showBackground = true)
 @Composable
 fun ReceivedDiaryScreenPreview() {
-    ReceivedDiaryScreen(navController = rememberNavController(), diaryContent = "오늘 하루는 정말 특별했어요. 작은 새가 창가에 찾아와 노래를 불러주었답니다.")
+    ReceivedDiaryScreen(
+        navController = rememberNavController(),
+        diaryContent = "오늘 하루는 정말 특별했어요. 작은 새가 창가에 찾아와 노래를 불러주었답니다."
+    )
 }
-
-
