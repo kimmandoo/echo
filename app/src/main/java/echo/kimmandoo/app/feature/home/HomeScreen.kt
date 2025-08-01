@@ -178,7 +178,7 @@ private fun PhysicsBasedMenuLayout(navController: NavController) {
                     }
 
                     // Update velocity and position
-                    val item = newItems[i]
+                    var item = newItems[i]
                     var newVelocity = (item.velocity + netForce * deltaTime) * friction
                     val newOffset = item.offset + newVelocity * deltaTime
 
@@ -312,7 +312,11 @@ fun DraggableMenuButton(
                     onDragEnd = { onDragEnd() }
                 )
             }
-            .clickable(onClick = onClick),
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick
+            ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
@@ -334,4 +338,5 @@ fun DraggableMenuButton(
 fun HomeScreenPreview() {
     HomeScreen(navController = rememberNavController())
 }
+
 
