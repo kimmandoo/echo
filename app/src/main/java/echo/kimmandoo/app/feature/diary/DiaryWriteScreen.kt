@@ -128,10 +128,12 @@ fun DiaryWriteScreen(
             // 오늘의 주제 섹션
             AnimatedVisibility(
                 visible = isVisible,
-                enter = fadeIn(animationSpec = tween(500, delayMillis = 300)) + slideInVertically(
-                    initialOffsetY = { it / 2 },
-                    animationSpec = tween(500, delayMillis = 300)
-                )
+                enter =
+                    fadeIn(animationSpec = tween(500, delayMillis = 300)) +
+                        slideInVertically(
+                            initialOffsetY = { it / 2 },
+                            animationSpec = tween(500, delayMillis = 300),
+                        ),
             ) {
                 TopicCard(topic = TopicProvider.getTodayTopic())
             }
@@ -180,11 +182,12 @@ fun DiaryWriteScreen(
 @Composable
 private fun TopicCard(topic: String) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
-            .padding(vertical = 16.dp, horizontal = 20.dp)
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                .padding(vertical = 16.dp, horizontal = 20.dp),
     ) {
         Text(
             text = "$topic",
@@ -192,7 +195,7 @@ private fun TopicCard(topic: String) {
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center,
-            modifier = Modifier.align(Alignment.Center)
+            modifier = Modifier.align(Alignment.Center),
         )
     }
 }

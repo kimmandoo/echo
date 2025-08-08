@@ -31,7 +31,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -91,11 +90,11 @@ fun HomeScreen(
     Scaffold {
         Box(
             modifier =
-            Modifier
-                .fillMaxSize()
-                .background(
-                    brush = GradientBackground,
-                ).padding(padding),
+                Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = GradientBackground,
+                    ).padding(padding),
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -115,7 +114,7 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(24.dp))
                     UserStatus(
                         starCoins = uiState.userData.currency.toInt(),
-                        hasFreeExchange = uiState.userData.freeLetterCount > 0
+                        hasFreeExchange = uiState.userData.freeLetterCount > 0,
                     )
                 }
             }
@@ -241,10 +240,10 @@ fun UserStatus(
 ) {
     Row(
         modifier =
-        Modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color.Black.copy(alpha = 0.05f))
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            Modifier
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color.Black.copy(alpha = 0.05f))
+                .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(24.dp),
     ) {
@@ -283,24 +282,24 @@ fun TodaySun(onClick: () -> Unit) {
 
     Box(
         modifier =
-        Modifier
-            .size(160.dp)
-            .clickable(remember { MutableInteractionSource() }, indication = null, onClick = onClick),
+            Modifier
+                .size(160.dp)
+                .clickable(remember { MutableInteractionSource() }, indication = null, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             drawCircle(
                 brush =
-                Brush.radialGradient(
-                    colors =
-                    listOf(
-                        Color(0xFFFFF59D).copy(alpha = 0.9f * pulse),
-                        Color(0xFFFBC02D).copy(alpha = 0.5f * pulse),
-                        Color.Transparent,
+                    Brush.radialGradient(
+                        colors =
+                            listOf(
+                                Color(0xFFFFF59D).copy(alpha = 0.9f * pulse),
+                                Color(0xFFFBC02D).copy(alpha = 0.5f * pulse),
+                                Color.Transparent,
+                            ),
+                        center = Offset(size.width / 2, size.height / 2),
+                        radius = size.width / 2 * pulse,
                     ),
-                    center = Offset(size.width / 2, size.height / 2),
-                    radius = size.width / 2 * pulse,
-                ),
             )
         }
 //        Text("오늘의 햇살", color = Color(0xFF4E342E), fontWeight = FontWeight.Bold, fontSize = 22.sp, style = MaterialTheme.typography.titleLarge)
@@ -319,29 +318,29 @@ fun DraggableMenuButton(
 ) {
     Column(
         modifier =
-        modifier
-            .pointerInput(Unit) {
-                detectDragGestures(
-                    onDragStart = { onDragStart() },
-                    onDrag = { change, dragAmount ->
-                        change.consume()
-                        onDrag(dragAmount)
-                    },
-                    onDragEnd = { onDragEnd() },
-                )
-            }.clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = onClick,
-            ),
+            modifier
+                .pointerInput(Unit) {
+                    detectDragGestures(
+                        onDragStart = { onDragStart() },
+                        onDrag = { change, dragAmount ->
+                            change.consume()
+                            onDrag(dragAmount)
+                        },
+                        onDragEnd = { onDragEnd() },
+                    )
+                }.clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onClick,
+                ),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box(
             modifier =
-            Modifier
-                .size(64.dp)
-                .clip(CircleShape)
-                .background(Color.White.copy(alpha = 0.5f)),
+                Modifier
+                    .size(64.dp)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = 0.5f)),
             contentAlignment = Alignment.Center,
         ) {
             Icon(icon, contentDescription = title, tint = Color(0xFF5D4037), modifier = Modifier.size(32.dp))

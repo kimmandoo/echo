@@ -8,7 +8,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import echo.kimmandoo.app.feature.auth.AuthScreen
 import echo.kimmandoo.app.feature.diary.DiaryCreationRoute
-import echo.kimmandoo.app.feature.store.StoreScreen
 import echo.kimmandoo.app.feature.home.HomeScreen
 import echo.kimmandoo.app.feature.mydiaries.MyDiariesScreen
 import echo.kimmandoo.app.feature.mydiaries.MyDiaryDetailScreen
@@ -16,6 +15,7 @@ import echo.kimmandoo.app.feature.profile.ProfileScreen
 import echo.kimmandoo.app.feature.receive.ReceiveDiaryScreen
 import echo.kimmandoo.app.feature.receive.ReceivedDiaryScreen
 import echo.kimmandoo.app.feature.receive.ReplyDiaryScreen
+import echo.kimmandoo.app.feature.store.StoreScreen
 
 @Composable
 fun AppNavHost(

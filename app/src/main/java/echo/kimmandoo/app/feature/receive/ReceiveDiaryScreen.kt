@@ -38,15 +38,15 @@ fun ReceiveDiaryScreen(navController: NavController) {
     val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) {
         Box(
             modifier =
-            Modifier
-                .fillMaxSize()
-                .background(
-                    brush = GradientBackground,
-                ).padding(it),
+                Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = GradientBackground,
+                    ).padding(it),
             contentAlignment = Alignment.Center,
         ) {
             Column(

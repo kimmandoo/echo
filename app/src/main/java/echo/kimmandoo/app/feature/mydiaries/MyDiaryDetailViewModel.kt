@@ -13,13 +13,12 @@ import kotlinx.coroutines.launch
 data class MyDiaryDetailUiState(
     val isLoading: Boolean = true,
     val replies: List<Reply> = emptyList(),
-    val error: String? = null
+    val error: String? = null,
 )
 
 class MyDiaryDetailViewModel(
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-
     private val diaryId: String = savedStateHandle.get<String>("diaryId") ?: ""
     private val repository = DiaryRepository()
 

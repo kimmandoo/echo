@@ -12,6 +12,5 @@ data class Diary(
     val emotion: String = "", // weather -> emotion
     @ServerTimestamp val timestamp: Date? = null,
     val status: String = "PRIVATE", // PRIVATE, PENDING, REPLIED
-    val reply: String? = null
+    val reply: String? = null,
 )
-

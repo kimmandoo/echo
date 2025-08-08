@@ -44,7 +44,7 @@ class ReceiveDiaryViewModel(
                         it.copy(
                             isLoading = false,
                             receivedDiary = result.diary,
-                            isFreeChanceAvailable = result.paidWith == "free" && (repository.getUserFreeChanceCount() > 0)
+                            isFreeChanceAvailable = result.paidWith == "free" && (repository.getUserFreeChanceCount() > 0),
                         )
                     }
                 }

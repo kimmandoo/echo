@@ -22,12 +22,12 @@ data class ActivityItem(
     val type: String = "", // DIARY_SENT, REPLY_SENT, REPLY_RECEIVED
     val contentSnippet: String = "",
     val relatedId: String = "", // Diary ID or Reply ID
-    val timestamp: Date = Date()
+    val timestamp: Date = Date(),
 )
 
 class HistoryRepository(
     private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
-    private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
 ) {
     private val uid: String? get() = auth.currentUser?.uid
 
@@ -40,7 +40,12 @@ class HistoryRepository(
     suspend fun getUserStats(): UserStats {
         val userId = uid ?: return UserStats()
         return try {
-            db.collection(USERS_COLLECTION).document(userId).get().await().toObject(UserStats::class.java) ?: UserStats()
+            db
+                .collection(USERS_COLLECTION)
+                .document(userId)
+                .get()
+                .await()
+                .toObject(UserStats::class.java) ?: UserStats()
         } catch (e: Exception) {
             println("Error getting user stats: $e")
             UserStats()
@@ -50,7 +55,8 @@ class HistoryRepository(
     suspend fun getTimelineActivities(): List<ActivityItem> {
         val userId = uid ?: return emptyList()
         return try {
-            db.collection(ACTIVITY_COLLECTION)
+            db
+                .collection(ACTIVITY_COLLECTION)
                 .whereEqualTo("userId", userId)
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .limit(50) // 성능을 위해 최근 50개만 로드
@@ -63,7 +69,10 @@ class HistoryRepository(
         }
     }
 
-    suspend fun getDiariesForMonth(year: Int, month: Int): List<Diary> {
+    suspend fun getDiariesForMonth(
+        year: Int,
+        month: Int,
+    ): List<Diary> {
         val userId = uid ?: return emptyList()
 
         val calendar = Calendar.getInstance()
@@ -78,7 +87,8 @@ class HistoryRepository(
         val endOfMonth = calendar.time
 
         return try {
-            db.collection(DIARIES_COLLECTION)
+            db
+                .collection(DIARIES_COLLECTION)
                 .whereEqualTo("authorId", userId)
                 .whereGreaterThanOrEqualTo("timestamp", startOfMonth)
                 .whereLessThanOrEqualTo("timestamp", endOfMonth)

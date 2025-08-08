@@ -21,7 +21,6 @@ data class HomeUiState(
 class HomeViewModel(
     private val userRepository: UserRepository = UserRepository(),
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -35,14 +34,13 @@ class HomeViewModel(
             userRepository.addDailyFreeChanceIfNeeded()
 
             // 2. 사용자 데이터 실시간 수신
-            userRepository.listenToUserData()
+            userRepository
+                .listenToUserData()
                 .onEach { userData ->
                     _uiState.update { it.copy(userData = userData, isLoading = false) }
-                }
-                .catch { e ->
+                }.catch { e ->
                     _uiState.update { it.copy(error = e.message, isLoading = false) }
-                }
-                .collect()
+                }.collect()
         }
     }
 }

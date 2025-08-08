@@ -20,7 +20,9 @@ sealed class Screen {
     data object MyDiaries : Screen()
 
     @Serializable
-    data class MyDiaryDetail(val diaryId: String) : Screen()
+    data class MyDiaryDetail(
+        val diaryId: String,
+    ) : Screen()
 
     @Serializable
     data object Store : Screen()

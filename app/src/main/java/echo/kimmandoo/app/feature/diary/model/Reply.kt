@@ -16,4 +16,3 @@ data class Reply(
     val isReplyToReply: Boolean
         get() = parentReplyId != null
 }
-
