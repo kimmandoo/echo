@@ -2,32 +2,37 @@ package echo.kimmandoo.app.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
 
 @Composable
 fun AuthNavigationEffect(
     navController: NavHostController,
     isLoggedIn: Boolean,
 ) {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
+    LaunchedEffect(isLoggedIn) {
+        val currentRoute = navController.currentBackStackEntry?.destination?.route
 
-    LaunchedEffect(isLoggedIn, currentDestination) {
         if (isLoggedIn) {
-            if (currentDestination?.hasRoute<Screen.Home>() != true) {
+            // 로그인 상태인데 현재 화면이 AuthScreen이면 HomeScreen으로 이동
+            if (currentRoute ==
+                Screen.Auth
+                    .serializer()
+                    .descriptor.serialName
+            ) {
                 navController.navigate(Screen.Home) {
-                    popUpTo(Screen.Auth) {
-                        inclusive = true
-                    }
+                    popUpTo(Screen.Auth) { inclusive = true }
                 }
             }
         } else {
-            if (currentDestination?.hasRoute<Screen.Auth>() != true) {
+            // 로그아웃 상태인데 현재 화면이 AuthScreen이 아니면 AuthScreen으로 이동
+            if (currentRoute !=
+                Screen.Auth
+                    .serializer()
+                    .descriptor.serialName
+            ) {
                 navController.navigate(Screen.Auth) {
-                    popUpTo(Screen.Auth) {
+                    popUpTo(navController.graph.findStartDestination().id) {
                         inclusive = true
                     }
                     launchSingleTop = true

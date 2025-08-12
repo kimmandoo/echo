@@ -30,7 +30,7 @@ import echo.kimmandoo.app.ui.theme.EchoTheme
 class MainActivity : ComponentActivity() {
     private val googleAuthUiClient by lazy {
         GoogleAuthUiClient(
-            context = applicationContext,
+            context = this,
             auth = Firebase.auth,
         )
     }
@@ -71,9 +71,10 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     AppNavHost(
                         navController = navController,
-                        startDestination = remember {
-                            if (googleAuthUiClient.getSignedInUser() != null) Screen.Home else Screen.Auth
-                        },
+                        startDestination =
+                            remember {
+                                if (googleAuthUiClient.getSignedInUser() != null) Screen.Home else Screen.Auth
+                            },
                         modifier = Modifier.padding(innerPadding),
                     )
                 }
