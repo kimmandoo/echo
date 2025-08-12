@@ -1,4 +1,4 @@
-package echo.kimmandoo.app.feature.diary
+package echo.kimmandoo.app.feature.diary.component
 
 import java.util.Calendar
 

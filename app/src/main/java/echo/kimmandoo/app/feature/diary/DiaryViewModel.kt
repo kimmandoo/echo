@@ -1,21 +1,19 @@
 package echo.kimmandoo.app.feature.diary
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import echo.kimmandoo.app.data.DiaryRepository
-import echo.kimmandoo.app.feature.diary.EmotionSticker
+import echo.kimmandoo.app.feature.diary.model.DiaryStatus
+import echo.kimmandoo.app.feature.diary.model.EmotionSticker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-enum class DiaryStatus {
-    WRITING,
-    SENDING,
-    COMPLETED,
-}
 
+@Immutable
 data class DiaryUiState(
     val status: DiaryStatus = DiaryStatus.WRITING,
     val diaryText: String = "",

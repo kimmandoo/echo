@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
+import echo.kimmandoo.app.feature.diary.model.DiaryStatus
 
 // TopLevel
 @Composable

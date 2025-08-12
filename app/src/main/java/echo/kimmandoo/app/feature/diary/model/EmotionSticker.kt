@@ -1,4 +1,4 @@
-package echo.kimmandoo.app.feature.diary
+package echo.kimmandoo.app.feature.diary.model
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
