@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Home
@@ -32,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
@@ -42,11 +41,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import echo.kimmandoo.app.feature.home.component.DraggableMenuButton
-import echo.kimmandoo.app.feature.home.component.TodaySun
+import echo.kimmandoo.app.feature.home.component.Mailbox
 import echo.kimmandoo.app.feature.home.component.UserStatus
 import echo.kimmandoo.app.feature.home.model.MenuItem
 import echo.kimmandoo.app.navigation.Screen
 import echo.kimmandoo.app.ui.theme.GradientBackground
+import kotlinx.coroutines.delay
 
 @Composable
 fun HomeScreen(
@@ -74,11 +74,11 @@ private fun HomeScreen(
     Scaffold { paddingValues ->
         Box(
             modifier =
-                Modifier
-                    .fillMaxSize()
-                    .background(
-                        brush = GradientBackground,
-                    ).padding(paddingValues),
+            Modifier
+                .fillMaxSize()
+                .background(
+                    brush = GradientBackground,
+                ).padding(paddingValues),
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -124,15 +124,24 @@ fun HomeScreenPreview() {
     )
 }
 
+private data class MenuItemData(val id: Int, val title: String, val icon: ImageVector, val route: Screen)
+
+private val homeMenuItemsData = listOf(
+    MenuItemData(1, "일기 쓰기", Icons.Default.Create, Screen.DiaryCreation),
+    MenuItemData(2, "나의 일기장", Icons.Default.Home, Screen.MyDiaries),
+    MenuItemData(3, "내 프로필", Icons.Default.Person, Screen.Profile),
+    MenuItemData(4, "상점", Icons.Default.Star, Screen.Store)
+)
+
 @Composable
 fun PhysicsBasedMenuLayout(navigateToReceivedDiaryScreen: (Screen) -> Unit) {
     var containerSize by remember { mutableStateOf<IntSize?>(null) }
 
     Box(
         modifier =
-            Modifier
-                .fillMaxSize()
-                .onSizeChanged { containerSize = it },
+        Modifier
+            .fillMaxSize()
+            .onSizeChanged { containerSize = it },
         contentAlignment = Alignment.Center,
     ) {
         containerSize?.let { size ->
@@ -143,37 +152,17 @@ fun PhysicsBasedMenuLayout(navigateToReceivedDiaryScreen: (Screen) -> Unit) {
             val menuItemsState =
                 remember(key1 = size) {
                     val yOffset = screenHeightPx * 0.35f
-                    val itemCount = 4
-                    val spacing = screenWidthPx / (itemCount + 1)
+                    val spacing = screenWidthPx / (homeMenuItemsData.size + 1)
                     mutableStateListOf(
-                        MenuItem(
-                            id = 1,
-                            title = "일기 쓰기",
-                            icon = Icons.Default.Create,
-                            route = Screen.DiaryCreation,
-                            offset = Offset(spacing * 1 - screenWidthPx / 2, yOffset),
-                        ),
-                        MenuItem(
-                            id = 2,
-                            title = "나의 일기장",
-                            icon = Icons.Default.Home,
-                            route = Screen.MyDiaries,
-                            offset = Offset(spacing * 2 - screenWidthPx / 2, yOffset),
-                        ),
-                        MenuItem(
-                            id = 3,
-                            title = "내 프로필",
-                            icon = Icons.Default.Person,
-                            route = Screen.Profile,
-                            offset = Offset(spacing * 3 - screenWidthPx / 2, yOffset),
-                        ),
-                        MenuItem(
-                            id = 4,
-                            title = "상점",
-                            icon = Icons.Default.Star,
-                            route = Screen.Store,
-                            offset = Offset(spacing * 4 - screenWidthPx / 2, yOffset),
-                        ),
+                        *homeMenuItemsData.mapIndexed { index, data ->
+                            MenuItem(
+                                id = data.id,
+                                title = data.title,
+                                icon = data.icon,
+                                route = data.route,
+                                offset = Offset(spacing * (index + 1) - screenWidthPx / 2, yOffset),
+                            )
+                        }.toTypedArray()
                     )
                 }
 
@@ -184,6 +173,17 @@ fun PhysicsBasedMenuLayout(navigateToReceivedDiaryScreen: (Screen) -> Unit) {
                     val itemRadiusPx = with(density) { 32.dp.toPx() }
                     MenuPhysicsController(menuItemsState, size, itemRadiusPx)
                 }
+
+            var mailboxSize by remember { mutableStateOf(IntSize.Zero) }
+            var isHoveringOnMailbox by remember { mutableStateOf(false) }
+            var isJustDropped by remember { mutableStateOf(false) }
+
+            LaunchedEffect(isJustDropped) {
+                if (isJustDropped) {
+                    delay(2000L)
+                    isJustDropped = false
+                }
+            }
 
             LaunchedEffect(key1 = physicsController) {
                 var lastFrameTime = withFrameNanos { it }
@@ -200,17 +200,11 @@ fun PhysicsBasedMenuLayout(navigateToReceivedDiaryScreen: (Screen) -> Unit) {
             menuItemsState.forEach { item ->
                 key(item.id) {
                     DraggableMenuButton(
-//                        modifier = Modifier.offset {
-//                            IntOffset(
-//                                item.offset.x.roundToInt(),
-//                                item.offset.y.roundToInt()
-//                            )
                         modifier =
-                            Modifier.graphicsLayer {
-                                // TODO: graphicsLayer랑 그냥 생으로 offset 처리하는 거 조사하기
-                                translationX = item.offset.x
-                                translationY = item.offset.y
-                            },
+                        Modifier.graphicsLayer {
+                            translationX = item.offset.x
+                            translationY = item.offset.y
+                        },
                         icon = item.icon,
                         title = item.title,
                         onClick = {
@@ -220,16 +214,36 @@ fun PhysicsBasedMenuLayout(navigateToReceivedDiaryScreen: (Screen) -> Unit) {
                         onDrag = { dragAmount ->
                             val index = menuItemsState.indexOfFirst { it.id == item.id }
                             if (index != -1) {
-                                menuItemsState[index] =
+                                val newItem =
                                     menuItemsState[index].copy(offset = menuItemsState[index].offset + dragAmount)
+                                menuItemsState[index] = newItem
+
+                                val distance = newItem.offset.getDistance()
+                                val mailboxRadius = mailboxSize.width / 2f
+                                isHoveringOnMailbox = if (mailboxRadius > 0) distance < mailboxRadius else false
                             }
                         },
-                        onDragEnd = { draggedItemId = null },
+                        onDragEnd = {
+                            if (isHoveringOnMailbox) {
+                                isJustDropped = true
+                                navigateToReceivedDiaryScreen(Screen.ReceiveDiary)
+                                val index = menuItemsState.indexOfFirst { it.id == draggedItemId }
+                                if (index != -1) {
+                                    menuItemsState.removeAt(index)
+                                }
+                            }
+                            draggedItemId = null
+                            isHoveringOnMailbox = false
+                        },
                     )
                 }
             }
 
-            TodaySun(onClick = { navigateToReceivedDiaryScreen(Screen.ReceiveDiary) })
+            Mailbox(
+                modifier = Modifier.onSizeChanged { mailboxSize = it },
+                isHovering = isHoveringOnMailbox,
+                isJustDropped = isJustDropped
+            )
         }
     }
 }
