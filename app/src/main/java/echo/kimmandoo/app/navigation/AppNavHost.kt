@@ -32,7 +32,9 @@ fun AppNavHost(
             AuthScreen()
         }
         composable<Screen.Home> {
-            HomeScreen(navController = navController)
+            HomeScreen(navigateToReceivedDiaryScreen = { screen ->
+                navController.navigate(screen)
+            })
         }
         composable<Screen.Profile> {
             ProfileScreen()
